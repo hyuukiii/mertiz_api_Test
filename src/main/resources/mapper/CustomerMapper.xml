@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.CustomerMapper">
+
+    <select id="getCustomer" resultType="map">
+        SELECT CUST_NO AS "custNo",
+               NAME AS "name",
+               AGE AS "age",
+               DISEASE_CODE AS "code",
+               RESULT_MSG AS "result"
+        FROM CUSTOMER_INSURANCE
+        ORDER BY CUST_NO ASC
+    </select>
+    
+    <update id="upsertCustomer" parameterType="map">
+        MERGE INTO CUSTOMER_INSURANCE T
+        USING DUAL
+        ON (T.CUST_NO = #{custNo})
+        WHEN MATCHED THEN
+            UPDATE SET T.NAME = #{name},
+                       T.AGE = #{age},
+                       T.DISEASE_CODE = #{code},
+                       T.RESULT_MSG = #{result}
+        WHEN NOT MATCHED THEN
+            INSERT(CUST_NO, NAME, AGE, DISEASE_CODE, RESULT_MSG)
+            VALUES (#{custNo}, #{name}, #{age}, #{code}, #{result})
+     </update>
+     
+     <delete id="deleteCustomer" parameterType="string">
+        DELETE FROM CUSTOMER_INSURANCE
+        WHERE CUST_NO = #{custNo}
+     </delete>
+     
+</mapper>

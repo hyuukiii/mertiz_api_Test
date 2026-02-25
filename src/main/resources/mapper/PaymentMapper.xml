@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.PaymentMapper">
+
+<select id="getPayments" parameterType="map" resultType="map">
+SELECT * FROM (
+	SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT PAY_ID AS "PAY_ID",
+			   USER_ID AS "USER_ID",
+			   AMOUNT AS "AMOUNT",
+			   PAY_DATE AS "PAY_DATE",
+			   STATUS AS "STATUS"
+		FROM PAYMENT_LOG
+		
+		<where>
+			<if test="userId != null and userId != ''">
+				USER_ID = #{userId}
+			</if>
+		</where>
+		
+		ORDER BY PAY_DATE DESC
+	) A
+	WHERE ROWNUM &lt;= #{endRow} )
+  WHERE RNUM &gt; #{startRow}	</select>
+  
+ </mapper>
+
+

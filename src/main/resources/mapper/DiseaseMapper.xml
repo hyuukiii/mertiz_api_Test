@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.DiseaseMapper">
+    
+    <insert id="insertDiseaseBatch" parameterType="java.util.List">
+        INSERT INTO DISEASE_HISTORY (SEQ, DISEASE_CODE, DISEASE_NAME, TREAT_DATE)
+        SELECT SEQ_DISEASE_HISTORY.NEXTVAL, T.* FROM (
+        	<foreach collection="list" item="item" separator="UNION ALL ">
+        		SELECT #{item.diseaseCode} AS DISEASE_CODE,
+        			   #{item.diseaseName} AS DISEASE_NAME,
+        			   #{item.treatDate}   AS TREAT_DATE
+        		FROM DUAL
+        	</foreach>
+        ) T
+    </insert>
+
+</mapper>
