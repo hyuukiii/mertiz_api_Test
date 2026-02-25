@@ -22,7 +22,7 @@ public class CustomerService {
 	}
 	
 	
-	// 고객 데이터 일괄 저장/삭제 (CRUD 분기 처리)
+	// 고객 데이터 일괄 저장/수정/삭제
 	@Transactional
 	public void saveCustomerBatch(List<Map<String, Object>> customerList) {
 		
