@@ -28,10 +28,7 @@ import com.example.demo.service.PaymentService;
 @CrossOrigin(origins = "*")
 @RestController
 public class PaymentController {
-	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	
+		
 	@Autowired
 	private CustomerService customerService;
 	
