@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:w2="http://www.inswave.com/websquare" xmlns:xf="http://www.w3.org/2002/xforms">
+    <head>
+        <w2:type>COMPONENT</w2:type>
+        <w2:buildDate/>
+        <w2:MSA/>
+        <xf:model>
+        	<w2:dataCollection baseNode="map">
+
+        		<w2:dataMap baseNode="map" id="dma_insuInfo">
+    				<w2:keyInfo>
+        				<w2:key id="gender" name="성별" dataType="text"></w2:key>
+					    <w2:key id="age" name="나이" dataType="number"></w2:key>
+					    <w2:key id="jobClass" name="직업급수" dataType="text"></w2:key>
+					    <w2:key id="diseaseCode" name="주질병" dataType="text"></w2:key>
+					    <w2:key id="diseaseHistory" name="과거병력" dataType="text"></w2:key>
+					        
+					    <w2:key id="premium" name="보험료" dataType="number"></w2:key>
+					    <w2:key id="resultMsg" name="심사결과" dataType="text"></w2:key>
+					</w2:keyInfo>
+				</w2:dataMap>
+
+        		<w2:dataList baseNode="list" repeatNode="map" id="dlt_diseaseMaster">
+        			<w2:columnInfo>
+        				<w2:column id="diseaseCode" name="질병코드" dataType="text"></w2:column>
+        				<w2:column id="diseaseName" name="질병명" dataType="text"></w2:column>
+        			</w2:columnInfo>
+        		</w2:dataList>
+
+        	</w2:dataCollection>
+
+        	<w2:workflowCollection />
+
+        	<xf:submission id="sbm_getDiseaseMaster" ref="" target="data:json,dlt_diseaseMaster"
+        		action="http://localhost:8081/api/disease-master" method="get" mediatype="application/json" mode="asynchronous"
+        		ev:submitdone="scwin.sbm_getDiseaseMaster_submitdone" ev:submiterror="scwin.sbm_getDiseaseMaster_submiterror" encoding=""
+        		instance="" replace="" errorHandler="" customHandler="" processMsg="" ev:submit="" abortTrigger="" singleMode="true" />
+
+        	<xf:submission id="sbm_calcPremium" ref="data:json,dma_insuInfo" target="data:json,dma_insuInfo"
+        		action="http://localhost:8081/api/calculate" method="post" mediatype="application/json" mode="asynchronous"
+        		ev:submitdone="scwin.sbm_calcPremium_submitdone" ev:submiterror="" encoding="" instance="" replace="" errorHandler=""
+        		customHandler="" processMsg="" ev:submit="" abortTrigger="" />
+        	<xf:submission id="sbm_savePremium" ref="data:json,dma_insuInfo" target="" action="http://localhost:8081/api/save-premium"
+        		method="post" mediatype="application/json" encoding="UTF-8" instance="" replace="" errorHandler="" customHandler=""
+        		mode="asynchronous" processMsg="" ev:submit="" ev:submitdone="scwin.saveConfirmCallback" ev:submiterror=""
+        		abortTrigger="">
+        	</xf:submission>
+        </xf:model>
+        <script lazy="false" type="text/javascript"><![CDATA[/* ==========================================
+    화면 최초 렌더링 시
+   ========================================== */
+scwin.onpageload = function() {
+    
+    // 기존 캐시 삭제 후 common.js 로드
+    let script = document.createElement("script");
+    script.src = "/common.js?v=" + new Date().getTime();
+    document.head.appendChild(script);
+
+    // 공통코드 조회
+    $p.executeSubmission("sbm_getDiseaseMaster");
+};
+
+
+/* ==========================================
+    공통코드 조회 성공/실패 콜백
+   ========================================== */
+scwin.sbm_getDiseaseMaster_submitdone = function(e) {
+    dlt_diseaseMaster.setJSON(e.responseJSON.dlt_diseaseMaster);
+    console.log("공통코드 조회 성공:", e);
+};
+
+scwin.sbm_getDiseaseMaster_submiterror = function(e) {
+    console.error("공통코드 조회 실패:", e);
+    alert("서버 에러 입니다");
+};
+
+
+/* ==========================================
+    간편 심사 실행 버튼
+   ========================================== */
+scwin.btn_calc_onclick = function(e) {
+    let gender = dma_insuInfo.get("gender");
+    let age = dma_insuInfo.get("age");
+    let jobClass = dma_insuInfo.get("jobClass");
+    let code = dma_insuInfo.get("diseaseCode");
+
+    if(!gender || gender === "") { alert("성별을 선택해주세요."); return;}
+    if(!age || String(age).trim() === "") { alert("나이를 입력해주세요."); return;} 
+    if(!jobClass || String(jobClass).trim() === "") { alert("직업 위험도를 선택해주세요."); return; }
+    if(!code || code.trim() === "") { alert("주질병을 선택해주세요."); return;}
+    
+    console.log("선택된 과거병력:", dma_insuInfo.get("diseaseHistory"));
+
+    $p.executeSubmission("sbm_calcPremium");
+};
+
+
+/* ==========================================
+    보험료 계산 완료 콜백
+   ========================================== */
+scwin.sbm_calcPremium_submitdone = function(e) {
+    console.log("계산 완료 응답", e.responseJSON);
+    alert("보험료 산출이 완료 되었습니다.");
+};
+
+
+/* ==========================================
+    심사 결과 저장 버튼
+   ========================================== */
+scwin.btn_savePremium_onclick = function(e) {
+    let resultMsg = dma_insuInfo.get("resultMsg");
+
+    if(!resultMsg || resultMsg.trim() === "") {
+        alert("먼저 [간편 심사 실행] 버튼을 눌러 보험료를 계산해주세요!");
+        return;
+    }
+
+    if(confirm("현재 계산된 심사 결과를 확정하고 저장 하시겠습니까?")) {
+        // 확인을 누르면 아래 콜백 함수 실행
+        scwin.saveConfirmCallback("OK");
+    }
+};
+
+
+/* ==========================================
+    저장 확인 콜백
+   ========================================== */
+scwin.saveConfirmCallback = function(returnValue) {
+    if(returnValue === "OK") {
+        console.log("저장 API 호출 시작");
+        $p.executeSubmission("sbm_savePremium");
+    }
+};
+]]>
+        
+        </script>
+        </head>
+    <body ev:onpageload="scwin.onpageload" style="padding: 30px; font-family: 'Malgun Gothic', sans-serif; min-width: 800px; background-color: #f4f6f9;">
+
+        <xf:group style="margin-bottom: 20px;">
+            <w2:textbox label="▶ 보험료 간편 심사 (Rule Engine 연동)" style="font-size: 20px; font-weight: bold; color: #2c3e50; padding-bottom: 10px; border-bottom: 2px solid #2c3e50;"></w2:textbox>
+        </xf:group>
+
+        <xf:group style="padding: 20px; border: 1px solid #ced4da; background-color: #ffffff; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <w2:textbox label="[고객 정보 입력]" style="font-size: 14px; font-weight: bold; color: #6c757d; margin-bottom: 15px;"></w2:textbox>
+            
+            <xf:group style="display: flex; align-items: center; margin-bottom: 15px;">
+                <w2:textbox label="성별 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                <xf:select1 id="rad_gender" ref="data:dma_insuInfo.gender" appearance="full" style="width: 200px; height: 32px; margin-right: 40px;" rows="1" cols="2">
+                    <xf:choices>
+                        <xf:item><xf:label><![CDATA[남자]]></xf:label><xf:value><![CDATA[M]]></xf:value></xf:item>
+                        <xf:item><xf:label><![CDATA[여자]]></xf:label><xf:value><![CDATA[F]]></xf:value></xf:item>
+                    </xf:choices>
+                </xf:select1>
+
+                <w2:textbox label="나이(세) :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                <xf:input ref="data:dma_insuInfo.age" dataType="number" style="width: 150px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 10px;"></xf:input>
+            </xf:group>
+
+            <xf:group style="display: flex; align-items: center; margin-bottom: 15px;">
+                <w2:textbox label="직업 위험도 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                <xf:select1 id="sel_jobClass" ref="data:dma_insuInfo.jobClass" appearance="minimal" chooseOption="true" chooseOptionLabel="- 선택 -" style="width: 200px; height: 32px; margin-right: 40px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 5px;">
+                    <xf:choices>
+                        <xf:item><xf:label><![CDATA[1급 (사무직/학생)]]></xf:label><xf:value><![CDATA[1]]></xf:value></xf:item>
+                        <xf:item><xf:label><![CDATA[2급 (영업/외근직)]]></xf:label><xf:value><![CDATA[2]]></xf:value></xf:item>
+                        <xf:item><xf:label><![CDATA[3급 (현장/생산직)]]></xf:label><xf:value><![CDATA[3]]></xf:value></xf:item>
+                    </xf:choices>
+                </xf:select1>
+
+                <w2:textbox label="주질병 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                <xf:select1 id="sel_diseaseCode" ref="data:dma_insuInfo.diseaseCode" appearance="minimal" chooseOption="true" chooseOptionLabel="- 질병 선택 -" style="width: 200px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 5px;">
+                    <xf:choices>
+                        <xf:itemset nodeset="data:dlt_diseaseMaster">
+                            <xf:label ref="diseaseName"></xf:label>
+                            <xf:value ref="diseaseCode"></xf:value>
+                        </xf:itemset>
+                    </xf:choices>
+                </xf:select1>
+            </xf:group>
+
+            <xf:group style="display: flex; align-items: center; margin-bottom: 20px;">
+                <w2:textbox label="과거 병력 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                <xf:select id="chk_diseaseHistory" ref="data:dma_insuInfo.diseaseHistory" appearance="full" style="width: 600px; height: 32px;" rows="1" cols="3">
+                    <xf:choices>
+                        <xf:item><xf:label><![CDATA[최근 3개월 내 병원방문]]></xf:label><xf:value><![CDATA[H01]]></xf:value></xf:item>
+                        <xf:item><xf:label><![CDATA[최근 1년 내 입원/수술]]></xf:label><xf:value><![CDATA[H02]]></xf:value></xf:item>
+                        <xf:item><xf:label><![CDATA[최근 5년 내 중대질환(암 등)]]></xf:label><xf:value><![CDATA[H03]]></xf:value></xf:item>
+                    </xf:choices>
+                </xf:select>
+            </xf:group>
+
+            <xf:group style="display: flex; justify-content: flex-end;">
+                <xf:trigger type="button" ev:onclick="scwin.btn_calc_onclick" style="width: 140px; height: 36px; background-color: #0d6efd; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s;" id="btn_calc">
+                    <xf:label><![CDATA[간편 심사 실행]]></xf:label>
+                </xf:trigger>
+            </xf:group>
+        </xf:group>
+
+
+        <xf:group style="padding: 25px; border: 2px solid #0dcaf0; background-color: #f0fdfa; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <w2:textbox label="[심사 결과 보고서]" style="font-size: 16px; font-weight: bold; color: #087f5b; margin-bottom: 20px; border-bottom: 1px dashed #0dcaf0; padding-bottom: 5px;"></w2:textbox>
+
+            <xf:group style="display: flex; align-items: center; margin-bottom: 15px;">
+                <w2:textbox label="최종 보험료 :" style="width: 100px; font-weight: bold; font-size: 15px;"></w2:textbox>
+                
+                <xf:input ref="data:dma_insuInfo.premium" displayFormat="#,###" dataType="number" readOnly="true" style="width: 150px; height: 36px; text-align: right; color: #e03131; font-weight: bold; font-size: 18px; background-color: #e9ecef; border: 1px solid #adb5bd; border-radius: 4px; padding-right: 10px; margin-right: 5px;"></xf:input>
+                <w2:textbox label="원" style="width: 30px; font-weight: bold; font-size: 15px;"></w2:textbox>
+            </xf:group>
+
+            <xf:group style="display: flex; align-items: center;">
+                <w2:textbox label="심사 메시지 :" style="width: 100px; font-weight: bold; font-size: 15px;"></w2:textbox>
+                <xf:input ref="data:dma_insuInfo.resultMsg" readOnly="true" style="width: 450px; height: 36px; font-weight: bold; color: #212529; font-size: 15px; background-color: #e9ecef; border: 1px solid #adb5bd; border-radius: 4px; padding-left: 15px;"></xf:input>            
+          </xf:group>
+          
+          <xf:group style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <xf:trigger type="button" ev:onclick="scwin.btn_savePremium_onclick" style="width: 150px; height: 36px; background-color: #198754; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; cursor: pointer;" id="savePremium">
+                    <xf:label><![CDATA[심사 결과 최종 저장]]></xf:label>
+                </xf:trigger>
+            </xf:group>
+       </xf:group>
+      
+
+    </body>
+</html>
