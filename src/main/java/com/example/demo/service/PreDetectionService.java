@@ -3,10 +3,17 @@ package com.example.demo.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.demo.mapper.PremiumMapper;
 
 @Service
 public class PreDetectionService {
+	
+	@Autowired
+	private PremiumMapper premiumMapper;
 	
 	/**
 	 * [비즈니스 로직] 보험료 산출 및 심사
@@ -39,4 +46,13 @@ public class PreDetectionService {
 		
 		return resultMap;
 	}
+	
+	/**
+	 * 화면에서 넘어온 심사계산 결과를 DB에 저장
+	 */
+	@Transactional
+	public void savePremiumLog(Map<String, Object> logData) { 
+		premiumMapper.insertCalcLog(logData); 
+	}
+	
 }	

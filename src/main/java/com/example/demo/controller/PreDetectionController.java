@@ -31,7 +31,7 @@ public class PreDetectionController {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
 		
-		// 나이,질병 코드 추출
+		// 나이,질병코드 추출
 		int age = Integer.parseInt(insuInfo.get("age").toString());
 		String code = (String) insuInfo.get("diseaseCode");
 		
@@ -45,6 +45,25 @@ public class PreDetectionController {
 		// 웹스퀘어 데이터리스트 이름에 맞게 수정 하여 리턴
 		Map<String, Object> response = new HashMap<>();
 		response.put("dma_insuInfo", insuInfo);
+		
+		return response;
+		
+	}
+	
+	/*
+	 * [API] 심사결과 DB에 저장
+	 */
+	@PostMapping("/api/save-premium")
+	public Map<String, Object> savePremium(@RequestBody Map<String, Object> requestData) {
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
+		
+		preDetectionService.savePremiumLog(insuInfo);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("status", "SUCCESS");
+		response.put("message", "심사 결과가 저장 되었습니다.");
 		
 		return response;
 		

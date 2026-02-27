@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.PremiumMapper">
+	<insert id="insertCalcLog" parameterType="map">
+		INSERT INTO PREMIUM_CALC_LOG (
+		LOG_SEQ,
+		AGE,
+		DISEASE_CODE,
+		PREMIUM,
+		RESULT_MSG,
+		CALC_DATE
+	) VALUES (
+		SEQ_PREMIUM_CALC.NEXTVAL,
+		#{age},
+		#{diseaseCode},
+		#{premium},
+		#{resultMsg},
+		SYSDATE
+	)
+	</insert>
+</mapper>
