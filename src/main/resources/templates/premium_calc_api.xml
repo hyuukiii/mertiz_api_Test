@@ -84,13 +84,11 @@ scwin.btn_calc_onclick = function(e) {
     let gender = dma_insuInfo.get("gender");
     let age = dma_insuInfo.get("age");
     let jobClass = dma_insuInfo.get("jobClass");
-    let code = dma_insuInfo.get("diseaseCode");
 
     if(!gender || gender === "") { alert("성별을 선택해주세요."); return;}
     if(!age || String(age).trim() === "") { alert("나이를 입력해주세요."); return;} 
     if(!jobClass || String(jobClass).trim() === "") { alert("직업 위험도를 선택해주세요."); return; }
-    if(!code || code.trim() === "") { alert("주질병을 선택해주세요."); return;}
-    
+
     console.log("선택된 과거병력:", dma_insuInfo.get("diseaseHistory"));
 
     $p.executeSubmission("sbm_calcPremium");
@@ -170,15 +168,18 @@ scwin.saveConfirmCallback = function(returnValue) {
                 </xf:select1>
 
                 <w2:textbox label="주질병 :" style="width: 80px; font-weight: bold;"></w2:textbox>
-                <xf:select1 id="sel_diseaseCode" ref="data:dma_insuInfo.diseaseCode" appearance="minimal" chooseOption="true" chooseOptionLabel="- 질병 선택 -" style="width: 200px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 5px;">
-                    <xf:choices>
-                        <xf:itemset nodeset="data:dlt_diseaseMaster">
-                            <xf:label ref="diseaseName"></xf:label>
-                            <xf:value ref="diseaseCode"></xf:value>
-                        </xf:itemset>
-                    </xf:choices>
-                </xf:select1>
-            </xf:group>
+        
+        		<xf:select1 id="sel_diseaseCode" ref="data:dma_insuInfo.diseaseCode" appearance="minimal" style="width: 200px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 5px;">
+            				<xf:choices>
+                				<xf:itemset nodeset="data:dlt_diseaseMaster">
+                    			<xf:label ref="diseaseName"></xf:label>
+                    			<xf:value ref="diseaseCode"></xf:value>
+                			</xf:itemset>
+            		</xf:choices>
+        		</xf:select1>
+        	
+        	
+          </xf:group>
 
             <xf:group style="display: flex; align-items: center; margin-bottom: 20px;">
                 <w2:textbox label="과거 병력 :" style="width: 80px; font-weight: bold;"></w2:textbox>

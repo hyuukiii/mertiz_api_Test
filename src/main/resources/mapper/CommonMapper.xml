@@ -8,6 +8,6 @@
 			   COM_NM AS "diseaseName"
 		FROM COMMON_CODE
 		WHERE GRP_CD = #{grpCd}
-		  AND USE_YN = 'Y'	ORDER BY SORT_SEQ ASC </select>
+		  AND USE_YN = 'Y'	ORDER BY SORT_SEQ ASC, COM_CD ASC </select> 
 	
 </mapper>

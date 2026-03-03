@@ -5,16 +5,16 @@
 	<insert id="insertCalcLog" parameterType="map">
 		INSERT INTO PREMIUM_CALC_LOG (
 		LOG_SEQ,
-		AGE,
-		DISEASE_CODE,
-		PREMIUM,
+		AGE, 
+		GENDER, 		 JOB_CLASS, DISEASE_CODE,
+		DISEASE_HISTORY, PREMIUM,
 		RESULT_MSG,
 		CALC_DATE
 	) VALUES (
 		SEQ_PREMIUM_CALC.NEXTVAL,
 		#{age},
-		#{diseaseCode},
-		#{premium},
+		#{gender}, 		   #{jobClass}, #{diseaseCode},
+		#{diseaseHistory}, #{premium},
 		#{resultMsg},
 		SYSDATE
 	)

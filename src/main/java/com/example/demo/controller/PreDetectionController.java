@@ -31,13 +31,18 @@ public class PreDetectionController {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
 		
-		// 나이,질병코드 추출
+		// 필요한 파라미터 추출
 		int age = Integer.parseInt(insuInfo.get("age").toString());
 		String code = (String) insuInfo.get("diseaseCode");
+		String gender = (String) insuInfo.get("gender");
+		String jobClass = (String) insuInfo.get("jobClass");
 		
-		// 서비스 레이어에서 결과를 받아온다.
-		Map<String, Object> calcResult = preDetectionService.calculatePremium(age, code);
+		// 다중 체크박스는 선택 하지 않으면 null 이므로 안전하게 처리
+		String diseaseHistory = insuInfo.get("diseaseHistory") != null ? (String) insuInfo.get("diseaseHistory") : "";
 		
+		// 서비스 레이어에 파라미터 전달
+		Map<String, Object> calcResult = preDetectionService.calculatePremium(age, gender, jobClass, code, diseaseHistory);
+				
 		// 서비스가 준 결과를 웹스퀘어 insuInfo에 추가
 		insuInfo.put("premium", calcResult.get("premium"));
 		insuInfo.put("resultMsg", calcResult.get("resultMsg"));

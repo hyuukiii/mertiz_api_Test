@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.demo.mapper.PremiumMapper;
 
@@ -21,25 +22,48 @@ public class PreDetectionService {
 	 * @param code 질병 코드
 	 * @return Map<String, Object> 계산된 보험료와 결과 메시지
 	 */
-	public Map<String, Object> calculatePremium(int age, String code) {
-		int finalPremium = 0;
-		String msg = "";
+	public Map<String, Object> calculatePremium(int age, String gender, String jobClass, String code, String diseaseHistory) {
 		
-		// 비즈니스 로직
-		if("I10".equals(code)) {
-			msg = "심사 거절 대상자(고혈압)";
-			finalPremium = 0;
-		} else {
-			if (age >= 50) {
-				finalPremium = 50000;
-				msg = "심사 승인 : 실버 플랜";
-			} else {
-				finalPremium = 30000;
-				msg = "심사 승인 : 베이직 플랜";
-			}
+		// 기본 보험료 세팅
+		int basePremium = (age >= 50) ? 50000 : 30000;
+		double surchargeRate = 1.0;
+		String msg = (age>= 50) ? "[승인] 실버 플랜" : "[승인] 베이직 플랜";
+		
+		
+		// 인수 거절 검사
+		if(diseaseHistory.contains("H02") || diseaseHistory.contains("H03")) {
+			Map<String, Object> resultMap = new HashMap<>();
+			resultMap.put("premium", 0);
+			resultMap.put("resultMsg", "인수 거절: 중대 질환 또는 최근 수술/입원 이력 존재");
+			return resultMap;
 		}
 		
-		// 계산 결과를 Map에 담아 반환
+		// ==========================================
+        // 보험료 할증 검사
+        // ==========================================
+		
+		// I10(고혈압)이면 30% 할증
+		if("I10".equals(code)) {
+			msg += "(고혈압 30% 할증)";
+			surchargeRate += 0.3;
+		}
+		
+		// 성별 M(남자)라면 10% 할증
+		if("M".equals(gender)) {
+			surchargeRate += 0.1;
+		}
+		
+		// 직업 위험도 할증 (2급 : 10%, 3급: +20%)
+		if("2".equals(jobClass)) {
+			surchargeRate += 0.1;
+		} else if("3".equals(jobClass)) {
+			surchargeRate += 0.2;
+		}
+		
+		// 최종 보험료 계산 (기본료 * 최종 할증률)
+		int finalPremium = (int) (basePremium * surchargeRate);
+		
+		// 결과 반환
 		Map<String, Object> resultMap = new HashMap<>();
 		resultMap.put("premium", finalPremium);
 		resultMap.put("resultMsg", msg);
