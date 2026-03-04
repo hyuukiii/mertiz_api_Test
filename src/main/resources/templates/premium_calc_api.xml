@@ -10,17 +10,20 @@
         	<w2:dataCollection baseNode="map">
 
         		<w2:dataMap baseNode="map" id="dma_insuInfo">
-    				<w2:keyInfo>
+        			<w2:keyInfo>
         				<w2:key id="gender" name="성별" dataType="text"></w2:key>
-					    <w2:key id="age" name="나이" dataType="number"></w2:key>
-					    <w2:key id="jobClass" name="직업급수" dataType="text"></w2:key>
-					    <w2:key id="diseaseCode" name="주질병" dataType="text"></w2:key>
-					    <w2:key id="diseaseHistory" name="과거병력" dataType="text"></w2:key>
-					        
-					    <w2:key id="premium" name="보험료" dataType="number"></w2:key>
-					    <w2:key id="resultMsg" name="심사결과" dataType="text"></w2:key>
-					</w2:keyInfo>
-				</w2:dataMap>
+        				<w2:key id="age" name="나이" dataType="number"></w2:key>
+        				<w2:key id="jobClass" name="직업급수" dataType="text"></w2:key>
+        				<w2:key id="diseaseCode" name="주질병" dataType="text"></w2:key>
+        				<w2:key id="diseaseHistory" name="과거병력" dataType="text"></w2:key>
+        				<w2:key id="premium" name="보험료" dataType="number"></w2:key>
+        				<w2:key id="resultMsg" name="심사결과" dataType="text"></w2:key>
+        				<w2:key id="height" name="키" dataType="number"></w2:key>
+        				<w2:key id="weight" name="몸무게" dataType="number"></w2:key>
+        				<w2:key id="smokeYn" name="흡연여부" dataType="text"></w2:key>
+        				<w2:key id="drinkFreq" name="음주빈도" dataType="text"></w2:key>
+        			</w2:keyInfo>
+        		</w2:dataMap>
 
         		<w2:dataList baseNode="list" repeatNode="map" id="dlt_diseaseMaster">
         			<w2:columnInfo>
@@ -84,7 +87,11 @@ scwin.btn_calc_onclick = function(e) {
     let gender = dma_insuInfo.get("gender");
     let age = dma_insuInfo.get("age");
     let jobClass = dma_insuInfo.get("jobClass");
+    let height = dma_insuInfo.get("height");
+    let weight = dma_insuInfo.get("weight");
 
+    if(!height || height === "") {alert("키를 입력해주세요"); return;}
+    if(!weight || weight === "") {alert("몸무게를 입력해주세요"); return;}
     if(!gender || gender === "") { alert("성별을 선택해주세요."); return;}
     if(!age || String(age).trim() === "") { alert("나이를 입력해주세요."); return;} 
     if(!jobClass || String(jobClass).trim() === "") { alert("직업 위험도를 선택해주세요."); return; }
@@ -191,6 +198,33 @@ scwin.saveConfirmCallback = function(returnValue) {
                     </xf:choices>
                 </xf:select>
             </xf:group>
+            
+            			<xf:group style="display: flex; align-items: center; margin-bottom: 15px;">
+                			<w2:textbox label="키(cm) :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                			<xf:input ref="data:dma_insuInfo.height" dataType="number" style="width: 100px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 10px; margin-right: 40px;"></xf:input>
+                			
+                			<w2:textbox label="몸무게(kg) :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                			<xf:input ref="data:dma_insuInfo.weight" dataType="number" style="width: 100px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 10px;"></xf:input>
+            			</xf:group>
+
+            			<xf:group style="display: flex; align-items: center; margin-bottom: 20px;">
+                			<w2:textbox label="흡연 여부 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                			<xf:select1 id="rad_smoke" ref="data:dma_insuInfo.smokeYn" appearance="full" style="width: 150px; height: 32px; margin-right: 40px;" rows="1" cols="2">
+                    		<xf:choices>
+                        		<xf:item><xf:label><![CDATA[예]]></xf:label><xf:value><![CDATA[Y]]></xf:value></xf:item>
+                        		<xf:item><xf:label><![CDATA[아니오]]></xf:label><xf:value><![CDATA[N]]></xf:value></xf:item>
+                    		</xf:choices>
+                		</xf:select1>
+
+                		<w2:textbox label="음주 빈도 :" style="width: 80px; font-weight: bold;"></w2:textbox>
+                				<xf:select1 id="sel_drink" ref="data:dma_insuInfo.drinkFreq" appearance="minimal" chooseOption="true" chooseOptionLabel="- 선택 -" style="width: 200px; height: 32px; border: 1px solid #ced4da; border-radius: 4px; padding-left: 5px;">
+                    				<xf:choices>
+                        				<xf:item><xf:label><![CDATA[안 마심 (0회)]]></xf:label><xf:value><![CDATA[NONE]]></xf:value></xf:item>
+                        				<xf:item><xf:label><![CDATA[가끔 (주 1~2회)]]></xf:label><xf:value><![CDATA[LOW]]></xf:value></xf:item>
+                        				<xf:item><xf:label><![CDATA[자주 (주 3회 이상)]]></xf:label><xf:value><![CDATA[HIGH]]></xf:value></xf:item>
+                    				</xf:choices>
+                				</xf:select1>
+            			</xf:group>
 
             <xf:group style="display: flex; justify-content: flex-end;">
                 <xf:trigger type="button" ev:onclick="scwin.btn_calc_onclick" style="width: 140px; height: 36px; background-color: #0d6efd; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s;" id="btn_calc">

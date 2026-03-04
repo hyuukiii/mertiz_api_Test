@@ -30,7 +30,7 @@ public class PreDetectionService {
 		String msg = (age>= 50) ? "[승인] 실버 플랜" : "[승인] 베이직 플랜";
 		
 		
-		// 인수 거절 검사
+		// 심사 거절 대상 ( H02[1년 내 수술/입원], H03[5년 내 암 등 중대질환] 이력이 있으면 무조건 거절 )
 		if(diseaseHistory.contains("H02") || diseaseHistory.contains("H03")) {
 			Map<String, Object> resultMap = new HashMap<>();
 			resultMap.put("premium", 0);

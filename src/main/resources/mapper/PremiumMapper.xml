@@ -4,19 +4,14 @@
 <mapper namespace="com.example.demo.mapper.PremiumMapper">
 	<insert id="insertCalcLog" parameterType="map">
 		INSERT INTO PREMIUM_CALC_LOG (
-		LOG_SEQ,
-		AGE, 
-		GENDER, 		 JOB_CLASS, DISEASE_CODE,
-		DISEASE_HISTORY, PREMIUM,
-		RESULT_MSG,
-		CALC_DATE
+		LOG_SEQ, AGE, GENDER, JOB_CLASS, DISEASE_CODE, DISEASE_HISTORY,
+		HEIGHT, WEIGHT, SMOKE_YN, DRINK_FREQ, 
+	 	RESULT_MSG, PREMIUM, CALC_DATE
 	) VALUES (
 		SEQ_PREMIUM_CALC.NEXTVAL,
-		#{age},
-		#{gender}, 		   #{jobClass}, #{diseaseCode},
-		#{diseaseHistory}, #{premium},
-		#{resultMsg},
-		SYSDATE
+		#{age}, #{gender}, #{jobClass}, #{diseaseCode}, #{diseaseHistory}, 
+		#{height}, #{weight}, #{smokeYn}, #{drinkFreq},
+		#{resultMsg}, #{premium}, SYSDATE
 	)
 	</insert>
 </mapper>
