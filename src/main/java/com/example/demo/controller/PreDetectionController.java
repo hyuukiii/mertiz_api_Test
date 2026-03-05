@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import dto.InsuInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,33 +26,15 @@ public class PreDetectionController {
 	@PostMapping("/api/calculate")
 	public Map<String, Object> calcuatePremium(@RequestBody Map<String, Object> requestData) {
 		
+		// 형변환 없이 DTO로 받는다.
+		InsuInfoDTO insuInfo = requestData.get("dma_insuInfo");
 		
-		// 클라이언트에서 온 데이터의 Map 형태의 데이터셋을 해제 시킴
-		@SuppressWarnings("unchecked")
-		Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
+		preDetectionService.calculatePremium(insuInfo);
 		
-		// 필요한 파라미터 추출
-		int age = Integer.parseInt(insuInfo.get("age").toString());
-		String code = (String) insuInfo.get("diseaseCode");
-		String gender = (String) insuInfo.get("gender");
-		String jobClass = (String) insuInfo.get("jobClass");
-		
-		// 다중 체크박스는 선택 하지 않으면 null 이므로 안전하게 처리
-		String diseaseHistory = insuInfo.get("diseaseHistory") != null ? (String) insuInfo.get("diseaseHistory") : "";
-		
-		// 서비스 레이어에 파라미터 전달
-		Map<String, Object> calcResult = preDetectionService.calculatePremium(age, gender, jobClass, code, diseaseHistory);
-				
-		// 서비스가 준 결과를 웹스퀘어 insuInfo에 추가
-		insuInfo.put("premium", calcResult.get("premium"));
-		insuInfo.put("resultMsg", calcResult.get("resultMsg"));
-		
-		// 웹스퀘어 데이터리스트 이름에 맞게 수정 하여 리턴
 		Map<String, Object> response = new HashMap<>();
 		response.put("dma_insuInfo", insuInfo);
 		
 		return response;
-		
 	}
 	
 	/*
@@ -61,9 +43,7 @@ public class PreDetectionController {
 	@PostMapping("/api/save-premium")
 	public Map<String, Object> savePremium(@RequestBody Map<String, Object> requestData) {
 		
-		@SuppressWarnings("unchecked")
-		Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
-		
+		InsuInfoDTO insuInfo = requestData.get("dma_insuInfo");
 		preDetectionService.savePremiumLog(insuInfo);
 		
 		Map<String, Object> response = new HashMap<>();
@@ -74,3 +54,37 @@ public class PreDetectionController {
 		
 	}
 }
+
+
+ /***** 레거시 코드 *****/
+//// 클라이언트에서 온 데이터의 Map 형태의 데이터셋을 해제 시킴
+//@SuppressWarnings("unchecked")
+//Map<String, Object> insuInfo = (Map<String, Object>) requestData.get("dma_insuInfo");
+//
+//// 필요한 파라미터 추출
+//int age = Integer.parseInt(insuInfo.get("age").toString());
+//String code = (String) insuInfo.get("diseaseCode");
+//String gender = (String) insuInfo.get("gender");
+//String jobClass = (String) insuInfo.get("jobClass");
+//
+//double height = Double.parseDouble(insuInfo.get("height").toString());
+//double weight = Double.parseDouble(insuInfo.get("weight").toString());
+//String smokeYn = (String) insuInfo.get("smokeYn");
+//String drinkFreq = (String) insuInfo.get("drinkFreq");
+//
+//// 다중 체크박스는 선택 하지 않으면 null 이므로 안전하게 처리
+//String diseaseHistory = insuInfo.get("diseaseHistory") != null ? (String) insuInfo.get("diseaseHistory") : "";
+//
+//// 서비스 레이어에 파라미터 전달
+//Map<String, Object> calcResult = preDetectionService.calculatePremium(age, gender, jobClass, code, diseaseHistory, 
+//																	   			height, weight,smokeYn,drinkFreq);
+//		
+//// 서비스가 준 결과를 웹스퀘어 insuInfo에 추가
+//insuInfo.put("premium", calcResult.get("premium"));
+//insuInfo.put("resultMsg", calcResult.get("resultMsg"));
+//
+//// 웹스퀘어 데이터리스트 이름에 맞게 수정 하여 리턴
+//Map<String, Object> response = new HashMap<>();
+//response.put("dma_insuInfo", insuInfo);
+//
+//return response;
