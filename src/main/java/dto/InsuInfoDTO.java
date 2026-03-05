@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class InsuInfoDTO {
-	private String Gender;
+	private String gender;
 	private int age;
 	private String jobClass;
 	private String diseaseCode;

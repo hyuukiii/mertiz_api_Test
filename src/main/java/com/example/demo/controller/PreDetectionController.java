@@ -24,7 +24,7 @@ public class PreDetectionController {
 	 * @param requestData 웹스퀘어에서 전송한 고객 정보 (Key: dma_insuInfo)
 	 */
 	@PostMapping("/api/calculate")
-	public Map<String, Object> calcuatePremium(@RequestBody Map<String, Object> requestData) {
+	public Map<String, Object> calcuatePremium(@RequestBody Map<String, InsuInfoDTO> requestData) {
 		
 		// 형변환 없이 DTO로 받는다.
 		InsuInfoDTO insuInfo = requestData.get("dma_insuInfo");
@@ -41,7 +41,7 @@ public class PreDetectionController {
 	 * [API] 심사결과 DB에 저장
 	 */
 	@PostMapping("/api/save-premium")
-	public Map<String, Object> savePremium(@RequestBody Map<String, Object> requestData) {
+	public Map<String, Object> savePremium(@RequestBody Map<String, InsuInfoDTO> requestData) {
 		
 		InsuInfoDTO insuInfo = requestData.get("dma_insuInfo");
 		preDetectionService.savePremiumLog(insuInfo);
