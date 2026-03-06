@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:w2="http://www.inswave.com/websquare" xmlns:xf="http://www.w3.org/2002/xforms">
+    <head>
+        <w2:type>COMPONENT</w2:type>
+        <xf:model></xf:model>
+        <script lazy="false" type="text/javascript"><![CDATA[
+scwin.onpageload = function() {
+    // 부모 화면에서 안전하게 던져준 JSON 데이터 꺼내기
+    let receiveData = $p.getParameter("paramData");
+
+    if(receiveData) {
+        console.log("부모 창에서 넘어온 데이터: ", receiveData);
+
+        //넘어온 데이터를 화면 컴포넌트에 바인딩
+        let infoStr = "나이: " + receiveData.age + "/ 주질병: " + receiveData.diseaseCode;
+        tbx_info.setValue(infoStr);
+    } else {
+        alert("전달된 데이터가 없습니다.");
+    }
+};
+
+scwin.btn_close_onclick = function(e) {
+    // 팝업 닫기
+    $p.closePopup();
+}
+]]></script>
+    </head>
+    <body ev:onpageload="scwin.onpageload" style="padding: 20px;">
+        <xf:group style="padding: 20px; border: 2px solid #dc3545; background-color: #fff5f5; border-radius: 8px;">
+            <w2:textbox label="🚨 정밀 심사 요청" style="font-size: 20px; font-weight: bold; color: #dc3545; margin-bottom: 20px;"></w2:textbox>
+            
+            <w2:textbox label="수신된 고객 정보:" style="font-weight: bold; margin-bottom: 5px;"></w2:textbox>
+            <w2:textbox id="tbx_info" label="데이터 로딩 중..." style="margin-bottom: 20px; padding: 10px; background-color: #ffffff; border: 1px solid #ced4da;"></w2:textbox>
+            
+            <w2:textbox label="위 고객의 병력이 복잡하여 심사팀에 정밀 심사를 의뢰합니다." style="margin-bottom: 20px;"></w2:textbox>
+            
+            <xf:trigger type="button" ev:onclick="scwin.btn_close_onclick" style="width: 100px; height: 32px; background-color: #6c757d; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                <xf:label><![CDATA[닫기]]></xf:label>
+            </xf:trigger>
+        </xf:group>
+    </body>
+</html>

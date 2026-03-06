@@ -138,6 +138,36 @@ scwin.saveConfirmCallback = function(returnValue) {
         $p.executeSubmission("sbm_savePremium");
     }
 };
+
+
+/* ==========================================
+    정밀 심사 팝업 버튼
+   ========================================== */
+scwin.btn_reqDetail_onclick = function(e) {
+    // 넘겨줄 데이터를 JSON 객체로 변환
+    let sendData = dma_insuInfo.getJSON();
+
+    // 만약 특정 고객번호만 넘기고 싶다면 추가하기
+    // sendData.custNO = "사용자-코드"
+
+    let popOpt = {
+        id : "popop_detail_req",
+        type : "wframePopup",
+        width : "550px",
+        height : "280px",
+        title : "정밀 심사 요청 팝업",
+
+        // dataObject 안에 JSON을 통째로 넣어서 던짐
+        dataObject : {
+            type : "json",
+            name : "paramData", // 팝업 창에서 이 이름으로 꺼내 씀
+            data : sendData     // 우리가 JSON으로 변환한 데이터
+        }
+    };
+
+    // 팝업 열기
+    $p.openPopup("/reqDetailPopup.xml", popOpt);
+};
 ]]>
         
         </script>
@@ -250,6 +280,9 @@ scwin.saveConfirmCallback = function(returnValue) {
           </xf:group>
           
           <xf:group style="display: flex; justify-content: flex-end; margin-top: 15px;">
+          		<xf:trigger type="button" ev:onclick="scwin.btn_reqDetail_onclick" style="width: 150px; height: 36px; background-color: #dc3545; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; cursor: pointer; margin-right: 10px;" id="btn_reqDetail">
+                    <xf:label><![CDATA[정밀 심사 요청]]></xf:label>
+                </xf:trigger>
                 <xf:trigger type="button" ev:onclick="scwin.btn_savePremium_onclick" style="width: 150px; height: 36px; background-color: #198754; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 15px; cursor: pointer;" id="savePremium">
                     <xf:label><![CDATA[심사 결과 최종 저장]]></xf:label>
                 </xf:trigger>
